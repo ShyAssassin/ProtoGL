@@ -2,26 +2,28 @@
 #include <iostream>
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include "window/window.h"
 
 int main() {
-    if (!glfwInit()) {
-        std::print("Failed to initialize GLFW");
-        return -1;
-    }
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "ProtoGL", nullptr, nullptr);
+    Window window(preferredBackend(), "Monarch", 800, 800);
 
-    glfwMakeContextCurrent(window);
-    if (!gladLoadGL((GLADloadfunc)glfwGetProcAddress)) {
-        std::print("Failed to initialize GLAD");
-        return -1;
-    }
+    while (!window.shouldClose()) {
+        auto events = window.poll();
+        for (const auto& event : events) {
+            if (event.type == EventType::CloseRequested) {
+                window.close();
+            }
+            if (event.type == EventType::KeyboardInput) {
+                if (event.keyboard.key == Key::Escape && event.keyboard.action == Action::Pressed) {
+                    window.close();
+                }
+            }
+        }
 
-    while (!glfwWindowShouldClose(window)) {
+        glClearColor(0.62f, 0.03f, 0.27f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        window.swapBuffers();
     }
 
     return 0;
