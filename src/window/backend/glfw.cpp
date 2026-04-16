@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <glad/gl.h>
 #include "glfw.h"
 
@@ -55,8 +54,8 @@ static Key glfwKeyToKey(int key) {
 
 static MouseButton glfwMouseButtonToMouseButton(int button) {
     switch (button) {
-        case GLFW_MOUSE_BUTTON_LEFT:   return MouseButton::Left;
-        case GLFW_MOUSE_BUTTON_RIGHT:  return MouseButton::Right;
+        case GLFW_MOUSE_BUTTON_LEFT: return MouseButton::Left;
+        case GLFW_MOUSE_BUTTON_RIGHT: return MouseButton::Right;
         case GLFW_MOUSE_BUTTON_MIDDLE: return MouseButton::Middle;
         default: return MouseButton::Other;
     }
@@ -64,8 +63,8 @@ static MouseButton glfwMouseButtonToMouseButton(int button) {
 
 static Action glfwActionToAction(int action) {
     switch (action) {
-        case GLFW_PRESS:   return Action::Pressed;
-        case GLFW_REPEAT:  return Action::Pressed;
+        case GLFW_PRESS: return Action::Pressed;
+        case GLFW_REPEAT: return Action::Pressed;
         case GLFW_RELEASE: return Action::Released;
         default: return Action::Released;
     }
@@ -76,8 +75,16 @@ GlfwWindow::GlfwWindow() {
         throw std::runtime_error("Failed to initialize GLFW");
     }
 
-    glfwWindowHint(GLFW_FOCUSED, GLFW_FALSE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+    glfwWindowHint(GLFW_FOCUSED, GLFW_TRUE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     m_window = glfwCreateWindow(100, 100, "Monarch", nullptr, nullptr);
     if (!m_window) {
@@ -89,8 +96,8 @@ GlfwWindow::GlfwWindow() {
     glfwSetKeyCallback(m_window, keyCallback);
     glfwSetScrollCallback(m_window, scrollCallback);
     glfwSetCursorPosCallback(m_window, cursorPosCallback);
-    glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
     glfwSetWindowSizeCallback(m_window, windowSizeCallback);
+    glfwSetMouseButtonCallback(m_window, mouseButtonCallback);
     glfwSetWindowCloseCallback(m_window, windowCloseCallback);
     glfwSetWindowFocusCallback(m_window, windowFocusCallback);
     glfwSetWindowMaximizeCallback(m_window, windowMaximizeCallback);
@@ -189,71 +196,71 @@ void GlfwWindow::setCursorPosition(uint32_t x, uint32_t y) {
     glfwSetCursorPos(m_window, static_cast<double>(x), static_cast<double>(y));
 }
 
-void GlfwWindow::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    WindowEvent e{};
-    e.type = EventType::KeyboardInput;
+void GlfwWindow::keyCallback(GLFWwindow* window, int key, int scancode, int action, int /*mods*/) {
+    WindowEvent event = {};
+    event.type = EventType::KeyboardInput;
     auto* self = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    e.keyboard = { glfwKeyToKey(key), glfwActionToAction(action), static_cast<uint32_t>(scancode) };
-    self->m_pendingEvents.push_back(e);
+    event.keyboard = { glfwKeyToKey(key), glfwActionToAction(action), static_cast<uint32_t>(scancode) };
+    self->m_pendingEvents.push_back(event);
 }
 
 void GlfwWindow::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-    WindowEvent e{};
-    e.type = EventType::MouseWheel;
+    WindowEvent event = {};
+    event.type = EventType::MouseWheel;
     auto* self = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    e.mouseWheel = { static_cast<float>(xoffset), static_cast<float>(yoffset) };
-    self->m_pendingEvents.push_back(e);
+    event.mouseWheel = { static_cast<float>(xoffset), static_cast<float>(yoffset) };
+    self->m_pendingEvents.push_back(event);
 }
 
 void GlfwWindow::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
-    WindowEvent e{};
-    e.cursor = { xpos, ypos };
-    e.type = EventType::CursorPosition;
+    WindowEvent event = {};
+    event.cursor = { xpos, ypos };
+    event.type = EventType::CursorPosition;
     auto* self = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    self->m_pendingEvents.push_back(e);
+    self->m_pendingEvents.push_back(event);
 }
 
-void GlfwWindow::mouseButtonCallback(GLFWwindow* window, int button, int action, int _mods) {
-    WindowEvent e{};
-    e.type = EventType::MouseButtonInput;
+void GlfwWindow::mouseButtonCallback(GLFWwindow* window, int button, int action, int /*mods*/) {
+    WindowEvent event = {};
+    event.type = EventType::MouseButtonInput;
     auto* self = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    e.mouseButton = { glfwActionToAction(action), glfwMouseButtonToMouseButton(button) };
-    self->m_pendingEvents.push_back(e);
+    event.mouseButton = { glfwActionToAction(action), glfwMouseButtonToMouseButton(button) };
+    self->m_pendingEvents.push_back(event);
 }
 
 void GlfwWindow::windowSizeCallback(GLFWwindow* window, int width, int height) {
-    WindowEvent e{};
-    e.type = EventType::Resize;
+    WindowEvent event = {};
+    event.type = EventType::Resize;
     auto* self = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    e.resize = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
-    self->m_pendingEvents.push_back(e);
+    event.resize = { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+    self->m_pendingEvents.push_back(event);
 }
 
 void GlfwWindow::windowCloseCallback(GLFWwindow* window) {
-    WindowEvent e{};
-    e.type = EventType::CloseRequested;
+    WindowEvent event = {};
+    event.type = EventType::CloseRequested;
     auto* self = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    self->m_pendingEvents.push_back(e);
+    self->m_pendingEvents.push_back(event);
 }
 
 void GlfwWindow::windowFocusCallback(GLFWwindow* window, int focused) {
-    WindowEvent e{};
-    e.type = focused ? EventType::FocusGained : EventType::FocusLost;
+    WindowEvent event = {};
+    event.type = focused ? EventType::FocusGained : EventType::FocusLost;
     auto* self = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    self->m_pendingEvents.push_back(e);
+    self->m_pendingEvents.push_back(event);
 }
 
 void GlfwWindow::windowMaximizeCallback(GLFWwindow* window, int maximized) {
-    WindowEvent e{};
-    e.type = maximized ? EventType::Maximized : EventType::Minimized;
+    WindowEvent event = {};
+    event.type = maximized ? EventType::Maximized : EventType::Minimized;
     auto* self = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    self->m_pendingEvents.push_back(e);
+    self->m_pendingEvents.push_back(event);
 }
 
 void GlfwWindow::contentScaleCallback(GLFWwindow* window, float xscale, float yscale) {
-    WindowEvent e{};
-    e.scale = { xscale, yscale };
-    e.type = EventType::ScaleFactorChanged;
+    WindowEvent event = {};
+    event.scale = { xscale, yscale };
+    event.type = EventType::ScaleFactorChanged;
     auto* self = static_cast<GlfwWindow*>(glfwGetWindowUserPointer(window));
-    self->m_pendingEvents.push_back(e);
+    self->m_pendingEvents.push_back(event);
 }

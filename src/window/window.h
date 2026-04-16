@@ -106,7 +106,6 @@ public:
 private:
     std::unique_ptr<NativeWindow> m_window;
 
-    std::string m_title;
     uint32_t m_width = 0;
     uint32_t m_height = 0;
     bool m_focused = false;
@@ -114,8 +113,9 @@ private:
     uint32_t m_fbHeight = 0;
     bool m_captureCursor = false;
     bool m_closeRequested = false;
-    std::unordered_set<Key, KeyHash> m_activeKeys;
+    std::string m_title = "Uninitialized Window";
     std::pair<float, float> m_scale = { 1.0f, 1.0f };
+    std::unordered_set<Key, KeyHash> m_activeKeys = {};
     std::pair<double, double> m_mouseDelta = { 0.0, 0.0 };
     std::pair<double, double> m_mousePosition = { 0.0, 0.0 };
 };

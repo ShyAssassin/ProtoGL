@@ -10,8 +10,7 @@ static std::unique_ptr<NativeWindow> createBackend(Backend backend) {
 }
 
 Window::Window(Backend backend, const std::string& title, uint32_t width, uint32_t height)
-    : m_title(title)
-    , m_window(createBackend(backend))
+    : m_window(createBackend(backend)), m_title(title)
 {
     m_window->setTitle(title);
     m_window->resize(width, height);

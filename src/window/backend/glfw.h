@@ -34,6 +34,7 @@ public:
 
 private:
     GLFWwindow* m_window = nullptr;
+    std::vector<WindowEvent> m_pendingEvents = {};
 
     static void windowCloseCallback(GLFWwindow* window);
     static void windowFocusCallback(GLFWwindow* window, int focused);
@@ -44,6 +45,4 @@ private:
     static void contentScaleCallback(GLFWwindow* window, float xscale, float yscale);
     static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
     static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-    std::vector<WindowEvent> m_pendingEvents;
 };
