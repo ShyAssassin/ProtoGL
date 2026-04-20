@@ -1,5 +1,6 @@
 #include "window.h"
 #include <stdexcept>
+#include <glad/gl.h>
 #include "backend/glfw.h"
 
 static std::unique_ptr<NativeWindow> createBackend(Backend backend) {
@@ -61,9 +62,10 @@ std::vector<WindowEvent> Window::poll() {
                 m_fbWidth = static_cast<uint32_t>(static_cast<float>(m_width) * m_scale.first);
                 m_fbHeight = static_cast<uint32_t>(static_cast<float>(m_height) * m_scale.second);
 
-                WindowEvent fb{};
+                WindowEvent fb = {};
                 fb.type = EventType::FramebufferResize;
                 fb.framebufferResize = { m_fbWidth, m_fbHeight };
+                glViewport(0, 0, m_fbWidth, m_fbHeight);
                 events.push_back(fb);
                 break;
             }
@@ -72,7 +74,7 @@ std::vector<WindowEvent> Window::poll() {
                 m_fbWidth = static_cast<uint32_t>(static_cast<float>(m_width) * m_scale.first);
                 m_fbHeight = static_cast<uint32_t>(static_cast<float>(m_height) * m_scale.second);
 
-                WindowEvent fb{};
+                WindowEvent fb = {};
                 fb.type = EventType::FramebufferResize;
                 fb.framebufferResize = { m_fbWidth, m_fbHeight };
                 events.push_back(fb);
@@ -96,7 +98,6 @@ std::vector<WindowEvent> Window::poll() {
             default:
                 break;
         }
-
         events.push_back(event);
     }
 
