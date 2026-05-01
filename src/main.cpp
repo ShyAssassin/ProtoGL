@@ -1,12 +1,18 @@
 #include <print>
 #include <iostream>
 #include <glad/gl.h>
-#include <GLFW/glfw3.h>
 #include "window/window.h"
 
-int main() {
+#include "gfx/shader.h"
 
+int main() {
     Window window(preferredBackend(), "Monarch", 800, 800);
+
+    Shader shader("shader/tri.glsl");
+
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
 
     while (!window.shouldClose()) {
         auto events = window.poll();
@@ -23,6 +29,8 @@ int main() {
 
         glClearColor(0.62f, 0.03f, 0.27f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        shader.use();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
         window.swapBuffers();
     }
 
